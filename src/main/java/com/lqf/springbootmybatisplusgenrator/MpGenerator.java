@@ -72,11 +72,11 @@ public class MpGenerator {
         // 包配置
         PackageConfig pc = new PackageConfig();
         pc.setParent(rb.getString("parent"));
-        pc.setController("controller." + rb.getString("className"));
-        pc.setService("service." + rb.getString("className"));
-        pc.setServiceImpl("service." + rb.getString("className") + ".impl");
-        pc.setEntity("bean." + rb.getString("className"));
-        pc.setMapper("dao." + rb.getString("className"));
+        pc.setController("controller");
+        pc.setService("service");
+        pc.setServiceImpl("service.impl");
+        pc.setEntity("bean");
+        pc.setMapper("dao");
         mpg.setPackageInfo(pc);
 
         // 自定义配置
@@ -91,7 +91,7 @@ public class MpGenerator {
             @Override
             public String outputFile(TableInfo tableInfo) {
                 // 自定义输入文件名称
-                return rb.getString("OutputDirXml") + "/mapper/" + rb.getString("className") + "/" + tableInfo.getEntityName() + StringPool.DOT_XML;
+                return rb.getString("OutputDirXml") + "/mapper/" + tableInfo.getEntityName() + StringPool.DOT_XML;
             }
         });
         cfg.setFileOutConfigList(focList);
@@ -107,7 +107,13 @@ public class MpGenerator {
         strategy.setNaming(NamingStrategy.underline_to_camel);
         strategy.setColumnNaming(NamingStrategy.underline_to_camel);
         strategy.setEntityLombokModel(true);
-        strategy.setInclude(rb.getString("tableName"));
+        //如果指定表名则根据表名生成对应的文件.否则生成全部表对应的文件
+        if(!rb.getString("tableName").isEmpty()) {
+            strategy.setInclude(new String[]{rb.getString("tableName")});
+        }else
+        {
+            strategy.setInclude(new String[]{});
+        }
         mpg.setStrategy(strategy);
         mpg.setTemplateEngine(new FreemarkerTemplateEngine());
         mpg.execute();
